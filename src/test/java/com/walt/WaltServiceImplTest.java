@@ -95,8 +95,6 @@ public class WaltServiceImplTest {
 
         Delivery driver2Delivery1 = new Delivery(driver2, restaurant, customer, deliveryTimeNow);
 
-        Delivery newDelivery = new Delivery(driver2, restaurant, customer, tomorrow());
-
         when(driverRepository.findAllDriversByCity(any())).thenReturn(
                 Lists.newArrayList(driver1, driver2)
         );
@@ -109,12 +107,8 @@ public class WaltServiceImplTest {
                 Lists.newArrayList(driver2Delivery1)
         );
 
-        waltService.createOrderAndAssignDriver(customer, restaurant, tomorrow());
-
-        List<Delivery> Driver2Deliveries = deliveryRepository.findAllByDriver(driver2);
-        System.out.println(Driver2Deliveries);
-        Assert.assertTrue(Driver2Deliveries.contains(newDelivery));
-
+        Driver availableDriver = ((WaltServiceImpl)(waltService)).findMatchDriverOrElseThrow(restaurant, tomorrow());
+        Assert.assertEquals(availableDriver, driver2);
     }
 
     @Test
