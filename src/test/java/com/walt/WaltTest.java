@@ -8,20 +8,18 @@ import com.walt.model.Restaurant;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@SpringBootTest
+@SpringBootTest()
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class WaltTest {
 
@@ -29,8 +27,8 @@ public class WaltTest {
     static class WaltServiceImplTestContextConfiguration {
 
         @Bean
-        public WaltService waltService() {
-            return new WaltServiceImpl();
+        public WaltService waltService(DriverRepository driverRepository, DeliveryRepository deliveryRepository) {
+            return new WaltServiceImpl(driverRepository, deliveryRepository);
         }
     }
 
@@ -53,7 +51,7 @@ public class WaltTest {
     RestaurantRepository restaurantRepository;
 
     @BeforeEach()
-    public void prepareData() {
+    public void prepareData(){
 
         City jerusalem = new City("Jerusalem");
         City tlv = new City("Tel-Aviv");
@@ -109,10 +107,9 @@ public class WaltTest {
     }
 
     @Test
-    public void testBasics() {
+    public void testBasics(){
 
-        assertEquals(((List<City>) cityRepository.findAll()).size(), 4);
+        assertEquals(((List<City>) cityRepository.findAll()).size(),4);
         assertEquals((driverRepository.findAllDriversByCity(cityRepository.findByName("Beer-Sheva")).size()), 2);
-
     }
 }

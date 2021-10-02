@@ -80,4 +80,30 @@ public class Delivery {
     public void setDistance(double distance) {
         this.distance = distance;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Delivery)) return false;
+
+        Delivery delivery = (Delivery) o;
+
+        if (!driver.equals(delivery.driver)) return false;
+        if (!restaurant.equals(delivery.restaurant)) return false;
+        if (!customer.equals(delivery.customer)) return false;
+        return deliveryTime.equals(delivery.deliveryTime);
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = driver.hashCode();
+        result = 31 * result + restaurant.hashCode();
+        result = 31 * result + customer.hashCode();
+        result = 31 * result + deliveryTime.hashCode();
+        temp = Double.doubleToLongBits(distance);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

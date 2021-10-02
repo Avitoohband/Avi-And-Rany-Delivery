@@ -44,14 +44,11 @@ public class NamedEntity {
 
         NamedEntity that = (NamedEntity) o;
 
-        if (!Objects.equals(id, that.id)) return false;
-        return Objects.equals(name, that.name);
+        return name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        return result;
+        return name.hashCode();
     }
 }

@@ -22,10 +22,14 @@ public class WaltServiceImpl implements WaltService {
     private static final int MIN_DELIVERY_DISTANCE = 0;
     private static final int MAX_DELIVERY_DISTANCE = 20;
 
+    private final DriverRepository driverRepository;
+    private final DeliveryRepository deliveryRepository;
+
     @Autowired
-    private DriverRepository driverRepository;
-    @Autowired
-    private DeliveryRepository deliveryRepository;
+    public WaltServiceImpl(DriverRepository driverRepository, DeliveryRepository deliveryRepository) {
+        this.driverRepository = driverRepository;
+        this.deliveryRepository = deliveryRepository;
+    }
 
     @Override
     public Delivery createOrderAndAssignDriver(Customer customer, Restaurant restaurant, Date deliveryTime) {
@@ -44,7 +48,7 @@ public class WaltServiceImpl implements WaltService {
         return toDescOrderReportList(driverRepository.findAllDriversByCity(city));
     }
 
-    public Driver findMatchDriverOrElseThrow(Restaurant restaurant, Date deliveryTime) {
+    private Driver findMatchDriverOrElseThrow(Restaurant restaurant, Date deliveryTime) {
         City restaurantCity = restaurant.getCity();
         return driverRepository.findAllDriversByCity(restaurantCity)
                 .stream()
