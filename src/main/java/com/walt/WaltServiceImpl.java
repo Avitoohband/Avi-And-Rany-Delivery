@@ -44,17 +44,17 @@ public class WaltServiceImpl implements WaltService {
         return toDescOrderReportList(driverRepository.findAllDriversByCity(city));
     }
 
-    private static int descendingComparator(DriverDistance o1, DriverDistance o2) {
-        return Double.compare(o2.getTotalDistance(), o1.getTotalDistance());
-    }
-
-    private Driver findMatchDriverOrElseThrow(Restaurant restaurant, Date deliveryTime) {
+    public Driver findMatchDriverOrElseThrow(Restaurant restaurant, Date deliveryTime) {
         City restaurantCity = restaurant.getCity();
         return driverRepository.findAllDriversByCity(restaurantCity)
                 .stream()
                 .filter(availableForDeliveryAt(deliveryTime))
                 .min(getComparatorForLeastBusy())
                 .orElseThrow(NoDriverFoundException::new);
+    }
+
+    private static int descendingComparator(DriverDistance o1, DriverDistance o2) {
+        return Double.compare(o2.getTotalDistance(), o1.getTotalDistance());
     }
 
     private Delivery saveDelivery(Customer customer, Restaurant restaurant, Date deliveryTime, Driver driver) {
