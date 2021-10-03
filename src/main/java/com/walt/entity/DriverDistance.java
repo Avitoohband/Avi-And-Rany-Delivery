@@ -1,4 +1,4 @@
-package com.walt.model;
+package com.walt.entity;
 
 public interface DriverDistance {
     Driver getDriver();

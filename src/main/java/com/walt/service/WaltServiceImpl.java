@@ -1,9 +1,10 @@
-package com.walt;
+package com.walt.service;
 
 import com.walt.dao.DeliveryRepository;
 import com.walt.dao.DriverRepository;
 import com.walt.exceptions.NoDriverFoundException;
-import com.walt.model.*;
+import com.walt.entity.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +27,16 @@ public class WaltServiceImpl implements WaltService {
     private final DeliveryRepository deliveryRepository;
 
     @Autowired
-    public WaltServiceImpl(DriverRepository driverRepository, DeliveryRepository deliveryRepository) {
+    public WaltServiceImpl(DriverRepository driverRepository,
+                           DeliveryRepository deliveryRepository) {
         this.driverRepository = driverRepository;
         this.deliveryRepository = deliveryRepository;
     }
 
     @Override
-    public Delivery createOrderAndAssignDriver(Customer customer, Restaurant restaurant, Date deliveryTime) {
+    public Delivery createOrderAndAssignDriver(Customer customer,
+                                               Restaurant restaurant,
+                                               Date deliveryTime) {
         Driver matchedDriver = findMatchDriverOrElseThrow(restaurant, deliveryTime);
 
         return saveDelivery(customer, restaurant, deliveryTime, matchedDriver);
@@ -48,31 +52,45 @@ public class WaltServiceImpl implements WaltService {
         return toDescOrderReportList(driverRepository.findAllDriversByCity(city));
     }
 
-    private Driver findMatchDriverOrElseThrow(Restaurant restaurant, Date deliveryTime) {
-        City restaurantCity = restaurant.getCity();
-        return driverRepository.findAllDriversByCity(restaurantCity)
-                .stream()
-                .filter(availableForDeliveryAt(deliveryTime))
-                .min(getComparatorForLeastBusy())
-                .orElseThrow(NoDriverFoundException::new);
+    @Override
+    public List<Driver> getAllDrivers() {
+        return driverRepository.findAll();
     }
 
     private static int descendingComparator(DriverDistance o1, DriverDistance o2) {
         return Double.compare(o2.getTotalDistance(), o1.getTotalDistance());
     }
 
-    private Delivery saveDelivery(Customer customer, Restaurant restaurant, Date deliveryTime, Driver driver) {
-        Delivery delivery = new Delivery(driver, restaurant, customer, deliveryTime);
-        delivery.setDistance(getRandomDeliveryDistance());
+    private Driver findMatchDriverOrElseThrow(Restaurant restaurant, Date deliveryTime) {
+        City restaurantCity = restaurant.getCity();
+        return driverRepository.findAllDriversByCity(restaurantCity)
+                               .stream()
+                               .filter(availableForDeliveryAt(deliveryTime))
+                               .min(getComparatorForLeastBusy())
+                               .orElseThrow(NoDriverFoundException::new);
+    }
 
-        return deliveryRepository.save(delivery);
+    private Delivery saveDelivery(Customer customer,
+                                  Restaurant restaurant,
+                                  Date deliveryTime,
+                                  Driver driver) {
+
+        return deliveryRepository.save(
+                Delivery.builder()
+                        .driver(driver)
+                        .restaurant(restaurant)
+                        .customer(customer)
+                        .deliveryTime(deliveryTime)
+                        .distance(getRandomDeliveryDistance())
+                        .build()
+        );
     }
 
     private Predicate<Driver> availableForDeliveryAt(Date deliveryTime) {
 
         return driver -> deliveryRepository.findAllByDriver(driver)
-                .stream()
-                .noneMatch(deliveryAt(deliveryTime));
+                                           .stream()
+                                           .noneMatch(deliveryAt(deliveryTime));
     }
 
     private Comparator<Driver> getComparatorForLeastBusy() {
@@ -80,7 +98,8 @@ public class WaltServiceImpl implements WaltService {
     }
 
     private double getRandomDeliveryDistance() {
-        return ThreadLocalRandom.current().nextInt(MIN_DELIVERY_DISTANCE, MAX_DELIVERY_DISTANCE + 1);
+        return ThreadLocalRandom.current()
+                                .nextInt(MIN_DELIVERY_DISTANCE, MAX_DELIVERY_DISTANCE + 1);
     }
 
     private Predicate<Delivery> deliveryAt(Date deliveryTime) {
@@ -105,9 +124,9 @@ public class WaltServiceImpl implements WaltService {
             @Override
             public Double getTotalDistance() {
                 return deliveryRepository.findAllByDriver(driver)
-                        .stream()
-                        .mapToDouble(Delivery::getDistance)
-                        .sum();
+                                         .stream()
+                                         .mapToDouble(Delivery::getDistance)
+                                         .sum();
             }
         };
     }

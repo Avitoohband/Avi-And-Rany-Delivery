@@ -1,6 +1,6 @@
 package com.walt.dao;
 
-import com.walt.model.Restaurant;
+import com.walt.entity.Restaurant;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

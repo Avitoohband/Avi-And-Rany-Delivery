@@ -1,10 +1,17 @@
 package com.walt;
 
-import com.walt.dao.*;
-import com.walt.model.City;
-import com.walt.model.Customer;
-import com.walt.model.Driver;
-import com.walt.model.Restaurant;
+import com.walt.dao.CityRepository;
+import com.walt.dao.CustomerRepository;
+import com.walt.dao.DeliveryRepository;
+import com.walt.dao.DriverRepository;
+import com.walt.dao.RestaurantRepository;
+import com.walt.entity.City;
+import com.walt.entity.Customer;
+import com.walt.entity.Driver;
+import com.walt.entity.Restaurant;
+import com.walt.service.WaltService;
+import com.walt.service.WaltServiceImpl;
+
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +21,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
 
-import javax.annotation.Resource;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import javax.annotation.Resource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest()
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -109,7 +117,7 @@ public class WaltTest {
     @Test
     public void testBasics(){
 
-        assertEquals(((List<City>) cityRepository.findAll()).size(),4);
+        assertEquals(((List<City>) cityRepository.findAll()).size(), 4);
         assertEquals((driverRepository.findAllDriversByCity(cityRepository.findByName("Beer-Sheva")).size()), 2);
     }
 }

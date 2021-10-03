@@ -1,6 +1,6 @@
 package com.walt.dao;
 
-import com.walt.model.Customer;
+import com.walt.entity.Customer;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

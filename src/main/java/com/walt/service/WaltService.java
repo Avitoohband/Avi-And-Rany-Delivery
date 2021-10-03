@@ -1,6 +1,6 @@
-package com.walt;
+package com.walt.service;
 
-import com.walt.model.*;
+import com.walt.entity.*;
 
 import java.util.Date;
 import java.util.List;
@@ -12,5 +12,7 @@ public  interface WaltService{
     List<DriverDistance> getDriverRankReport();
 
     List<DriverDistance> getDriverRankReportByCity(City city);
+
+    List<Driver> getAllDrivers();
 }
 

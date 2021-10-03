@@ -1,6 +1,6 @@
 package com.walt.dao;
 
-import com.walt.model.City;
+import com.walt.entity.City;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
