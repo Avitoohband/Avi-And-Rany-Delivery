@@ -4,6 +4,7 @@ import com.walt.entity.City;
 import com.walt.entity.Driver;
 import com.walt.rest.controller.DriverController;
 import com.walt.service.WaltService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
 import java.util.List;
 
 import lombok.SneakyThrows;
@@ -49,13 +51,23 @@ public class DriverControllerTest {
 
     @SneakyThrows
     @Test
-    public void whenRequestAllDrivers_responseIsOK_JSON_withDrivers() {
+    public void whenRequestAllDrivers_andHasDrivers_responseIsOK_JSON_withDrivers() {
         when(waltService.getAllDrivers()).thenReturn(drivers);
 
         mockMvc.perform(get("/api/drivers"))
                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.length()").value(drivers.size()));
+    }
+
+    @SneakyThrows
+    @Test
+    public void whenRequestAllDrivers_andHasNoDrivers_responseIsOK_withoutDrivers() {
+        when(waltService.getAllDrivers()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/drivers"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.length()").value(0));
     }
 
 }
