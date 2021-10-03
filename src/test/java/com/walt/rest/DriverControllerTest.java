@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -95,6 +96,33 @@ public class DriverControllerTest {
                .andExpect(jsonPath("$.length()").value(0));
     }
 
+    @SneakyThrows
+    @Test
+    public void whenRequestGetDriverByName_andHasMatchingDriver_responseOK_withDriver() {
+        Optional<Driver> optionalDriver = Optional.of(createRandomDriver());
+        String driverName = optionalDriver.get().getName();
+
+        when(waltService.getDriverByName(driverName)).thenReturn(optionalDriver);
+
+        mockMvc.perform(get(ENDPOINT_DRIVERS + "/{name}", driverName))
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.name").value(driverName));
+    }
+
+    @SneakyThrows
+    @Test
+    public void whenRequestGetDriverByName_andHasNoMatchingDriver_responseNotFound() {
+        Optional<Driver> optionalDriver = Optional.of(createRandomDriver());
+        String driverName = optionalDriver.get().getName();
+
+        when(waltService.getDriverByName(driverName)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get(ENDPOINT_DRIVERS + "/{name}", driverName))
+               .andExpect(status().isNotFound());
+    }
+
+
     private List<Delivery> createRandomDeliveries(int totalDeliveries) {
         return IntStream.range(0, totalDeliveries)
                         .mapToObj(__ -> createRandomDelivery())
@@ -149,7 +177,7 @@ public class DriverControllerTest {
     }
 
     private String randomName(int length) {
-        return UUID.randomUUID().toString().substring(length);
+        return UUID.randomUUID().toString().substring(0, length);
     }
 
     private double createRandomDistance(int begin, int end) {

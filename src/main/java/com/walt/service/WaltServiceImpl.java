@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -60,6 +61,11 @@ public class WaltServiceImpl implements WaltService {
     @Override
     public List<Delivery> getAllDeliveries() {
         return deliveryRepository.findAll();
+    }
+
+    @Override
+    public Optional<Driver> getDriverByName(String name) {
+        return driverRepository.findByName(name);
     }
 
     private static int descendingComparator(DriverDistance o1, DriverDistance o2) {

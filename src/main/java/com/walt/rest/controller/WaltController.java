@@ -6,6 +6,7 @@ import com.walt.service.WaltService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,5 +30,10 @@ public class WaltController {
     @GetMapping("/deliveries")
     public ResponseEntity<List<Delivery>> getAllDeliveries() {
         return ResponseEntity.of(Optional.of(waltService.getAllDeliveries()));
+    }
+
+    @GetMapping("/drivers/{name}")
+    public ResponseEntity<Driver> getDriverByName(@PathVariable String name) {
+        return ResponseEntity.of(waltService.getDriverByName(name));
     }
 }
