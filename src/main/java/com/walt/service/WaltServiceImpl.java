@@ -57,6 +57,11 @@ public class WaltServiceImpl implements WaltService {
         return driverRepository.findAll();
     }
 
+    @Override
+    public List<Delivery> getAllDeliveries() {
+        return deliveryRepository.findAll();
+    }
+
     private static int descendingComparator(DriverDistance o1, DriverDistance o2) {
         return Double.compare(o2.getTotalDistance(), o1.getTotalDistance());
     }

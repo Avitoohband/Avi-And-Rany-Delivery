@@ -14,5 +14,7 @@ public  interface WaltService{
     List<DriverDistance> getDriverRankReportByCity(City city);
 
     List<Driver> getAllDrivers();
+
+    List<Delivery> getAllDeliveries();
 }
 

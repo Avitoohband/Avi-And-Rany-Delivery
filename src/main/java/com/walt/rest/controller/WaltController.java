@@ -1,5 +1,6 @@
 package com.walt.rest.controller;
 
+import com.walt.entity.Delivery;
 import com.walt.entity.Driver;
 import com.walt.service.WaltService;
 
@@ -14,15 +15,19 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/drivers")
+@RequestMapping("/api")
 @RequiredArgsConstructor
-public class DriverController {
+public class WaltController {
 
     private final WaltService waltService;
 
-    @GetMapping
+    @GetMapping("/drivers")
     public ResponseEntity<List<Driver>> getAllDrivers() {
-        List<Driver> allDrivers = waltService.getAllDrivers();
-        return ResponseEntity.of(Optional.of(allDrivers));
+        return ResponseEntity.of(Optional.of(waltService.getAllDrivers()));
+    }
+
+    @GetMapping("/deliveries")
+    public ResponseEntity<List<Delivery>> getAllDeliveries() {
+        return ResponseEntity.of(Optional.of(waltService.getAllDeliveries()));
     }
 }
