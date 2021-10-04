@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(WaltController.class)
-public class DriverControllerTest {
+public class WaltControllerTest {
     public static final String ENDPOINT_DRIVERS = "/api/drivers";
     public static final String ENDPOINT_DELIVERIES = "/api/deliveries";
     public static final int LENGTH_NAME_DRIVER = 8;
