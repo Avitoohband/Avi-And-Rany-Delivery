@@ -1,6 +1,6 @@
 package com.walt.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,14 +32,14 @@ public class Delivery {
     @ManyToOne
     private Customer customer;
 
-    private Date deliveryTime;
+    private LocalDateTime deliveryTime;
     private double distance;
 
     @Builder
     public Delivery(Driver driver,
                     Restaurant restaurant,
                     Customer customer,
-                    Date deliveryTime, double distance) {
+                    LocalDateTime deliveryTime, double distance) {
         this.driver = driver;
         this.restaurant = restaurant;
         this.customer = customer;

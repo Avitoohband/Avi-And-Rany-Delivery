@@ -1,15 +1,21 @@
 package com.walt.service;
 
+import com.walt.dao.CityRepository;
 import com.walt.dao.DeliveryRepository;
 import com.walt.dao.DriverRepository;
+import com.walt.entity.City;
+import com.walt.entity.Customer;
+import com.walt.entity.Delivery;
+import com.walt.entity.Driver;
+import com.walt.entity.DriverDistance;
+import com.walt.entity.Restaurant;
 import com.walt.exceptions.NoDriverFoundException;
-import com.walt.entity.*;
+import com.walt.exceptions.NoSuchCityException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,8 +23,11 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Service
+@RequiredArgsConstructor
 public class WaltServiceImpl implements WaltService {
 
     private static final int MIN_DELIVERY_DISTANCE = 0;
@@ -26,19 +35,13 @@ public class WaltServiceImpl implements WaltService {
 
     private final DriverRepository driverRepository;
     private final DeliveryRepository deliveryRepository;
-
-    @Autowired
-    public WaltServiceImpl(DriverRepository driverRepository,
-                           DeliveryRepository deliveryRepository) {
-        this.driverRepository = driverRepository;
-        this.deliveryRepository = deliveryRepository;
-    }
+    private final CityRepository cityRepository;
 
     @Override
     public Delivery createOrderAndAssignDriver(Customer customer,
                                                Restaurant restaurant,
-                                               Date deliveryTime) {
-        Driver matchedDriver = findMatchDriverOrElseThrow(restaurant, deliveryTime);
+                                               LocalDateTime deliveryTime) {
+        Driver matchedDriver = findMatchDriverOrElseThrow(deliveryTime, restaurant.getCity());
 
         return saveDelivery(customer, restaurant, deliveryTime, matchedDriver);
     }
@@ -68,13 +71,23 @@ public class WaltServiceImpl implements WaltService {
         return driverRepository.findByName(name);
     }
 
+    @Override
+    public Optional<Driver> locateDriverForDeliveryAt(String cityName, LocalDateTime deliveryTime) {
+        City city = cityRepository.findByName(cityName)
+                                  .orElseThrow(NoSuchCityException::new);
+        return driverRepository.findAllDriversByCity(city)
+                               .stream()
+                               .filter(availableForDeliveryAt(deliveryTime))
+                               .min(getComparatorForLeastBusy());
+    }
+
     private static int descendingComparator(DriverDistance o1, DriverDistance o2) {
         return Double.compare(o2.getTotalDistance(), o1.getTotalDistance());
     }
 
-    private Driver findMatchDriverOrElseThrow(Restaurant restaurant, Date deliveryTime) {
-        City restaurantCity = restaurant.getCity();
-        return driverRepository.findAllDriversByCity(restaurantCity)
+    @Deprecated
+    private Driver findMatchDriverOrElseThrow(LocalDateTime deliveryTime, City city) {
+        return driverRepository.findAllDriversByCity(city)
                                .stream()
                                .filter(availableForDeliveryAt(deliveryTime))
                                .min(getComparatorForLeastBusy())
@@ -83,7 +96,7 @@ public class WaltServiceImpl implements WaltService {
 
     private Delivery saveDelivery(Customer customer,
                                   Restaurant restaurant,
-                                  Date deliveryTime,
+                                  LocalDateTime deliveryTime,
                                   Driver driver) {
 
         return deliveryRepository.save(
@@ -97,7 +110,7 @@ public class WaltServiceImpl implements WaltService {
         );
     }
 
-    private Predicate<Driver> availableForDeliveryAt(Date deliveryTime) {
+    private Predicate<Driver> availableForDeliveryAt(LocalDateTime deliveryTime) {
 
         return driver -> deliveryRepository.findAllByDriver(driver)
                                            .stream()
@@ -113,7 +126,7 @@ public class WaltServiceImpl implements WaltService {
                                 .nextInt(MIN_DELIVERY_DISTANCE, MAX_DELIVERY_DISTANCE + 1);
     }
 
-    private Predicate<Delivery> deliveryAt(Date deliveryTime) {
+    private Predicate<Delivery> deliveryAt(LocalDateTime deliveryTime) {
         return delivery -> Objects.equals(delivery.getDeliveryTime(), deliveryTime);
     }
 

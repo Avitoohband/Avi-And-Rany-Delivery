@@ -18,10 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +51,7 @@ public class WaltServiceImplTest {
         assertThrows(NoDriverFoundException.class,
                      () -> waltService.createOrderAndAssignDriver(new Customer(),
                                                                   new Restaurant(),
-                                                                  new Date()));
+                                                                  LocalDateTime.now()));
     }
 
     @Test
@@ -61,8 +60,8 @@ public class WaltServiceImplTest {
         Driver driver = new Driver("Moshe", city);
         Customer customer = new Customer("David", city, "Borochov");
         Restaurant restaurant = new Restaurant("Japan-Japan", city, "Hahagana 21");
-        Date deliveryTimeNow = new Date();
-        Date deliveryTimeTomorrow = tomorrow();
+        LocalDateTime deliveryTimeNow = LocalDateTime.now();
+        LocalDateTime deliveryTimeTomorrow = deliveryTimeNow.plusDays(1);
 
         Delivery deliveryNow = Delivery.builder()
                                        .driver(driver)
@@ -95,13 +94,13 @@ public class WaltServiceImplTest {
         assertEquals(expectedDelivery, actualDelivery);
     }
 
-    @Test()
+    @Test
     public void whenAvailableDriverIsOccupiedAtAGivenTime_shouldThrow() {
         City city = new City("TelAviv");
         Driver driver = new Driver("Moshe", city);
         Customer customer = new Customer("David", city, "Borochov");
         Restaurant restaurant = new Restaurant("Japan-Japan", city, "Hahagana 21");
-        Date deliveryTimeNow = new Date();
+        LocalDateTime deliveryTimeNow = LocalDateTime.now();
 
 
         Delivery deliveryNow = Delivery.builder()
@@ -132,7 +131,7 @@ public class WaltServiceImplTest {
         Driver leaseBusyDriver = new Driver("David", city);
         Customer customer = new Customer("David", city, "Borochov");
         Restaurant restaurant = new Restaurant("Japan-Japan", city, "Hahagana 21");
-        Date deliveryTimeNow = new Date();
+        LocalDateTime deliveryTimeNow = LocalDateTime.now();
 
         Delivery driver1Delivery1 = Delivery.builder()
                                             .driver(busyDriver)
@@ -189,11 +188,8 @@ public class WaltServiceImplTest {
 
 
         Restaurant restaurant = new Restaurant("Tamara", city, "Agudat Hapoel 2");
-        Date deliveryTimeNow = new Date();
-        Calendar c = Calendar.getInstance();
-        c.setTime(deliveryTimeNow);
-        c.add(Calendar.DATE, 1);
-        Date deliveryTimeTomorrow = c.getTime();
+        LocalDateTime deliveryTimeNow = LocalDateTime.now();
+        LocalDateTime deliveryTimeTomorrow = tomorrow();
 
         Delivery driver1Delivery1 = Delivery.builder()
                                             .driver(driver1)
@@ -282,8 +278,8 @@ public class WaltServiceImplTest {
         Driver driver3 = new Driver("David", city);
 
         Restaurant restaurant = new Restaurant("Tamara", city, "Agudat Hapoel 2");
-        Date deliveryTimeNow = new Date();
-        Date deliveryTimeTomorrow = tomorrow();
+        LocalDateTime deliveryTimeNow = LocalDateTime.now();
+        LocalDateTime deliveryTimeTomorrow = tomorrow();
 
         Delivery driver1Delivery1 = Delivery.builder()
                                             .driver(driver1)
@@ -361,11 +357,7 @@ public class WaltServiceImplTest {
         assertEquals(copyResultDistances, resultDistances, "List is not sorted!");
     }
 
-    private static Date tomorrow() {
-        Date date = new Date();
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.add(Calendar.DATE, 1);
-        return c.getTime();
+    private static LocalDateTime tomorrow() {
+        return LocalDateTime.now().plusDays(1);
     }
 }

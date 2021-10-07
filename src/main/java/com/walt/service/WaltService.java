@@ -7,7 +7,7 @@ import com.walt.entity.Driver;
 import com.walt.entity.DriverDistance;
 import com.walt.entity.Restaurant;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +15,7 @@ public interface WaltService {
 
     Delivery createOrderAndAssignDriver(Customer customer,
                                         Restaurant restaurant,
-                                        Date deliveryTime);
+                                        LocalDateTime deliveryTime);
 
     List<DriverDistance> getDriverRankReport();
 
@@ -26,5 +26,7 @@ public interface WaltService {
     List<Delivery> getAllDeliveries();
 
     Optional<Driver> getDriverByName(String name);
+
+    Optional<Driver> locateDriverForDeliveryAt(String cityName, LocalDateTime deliveryTime);
 }
 

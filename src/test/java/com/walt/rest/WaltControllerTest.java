@@ -15,8 +15,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +27,7 @@ import java.util.stream.IntStream;
 
 import lombok.SneakyThrows;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(WaltController.class)
 public class WaltControllerTest {
     public static final String ENDPOINT_DRIVERS = "/api/drivers";
+    public static final String ENDPOINT_LOCATE_DRIVER = "/api/drivers/locate";
     public static final String ENDPOINT_DELIVERIES = "/api/deliveries";
     public static final int LENGTH_NAME_DRIVER = 8;
     public static final int LENGTH_NAME_CITY = 8;
@@ -122,6 +125,27 @@ public class WaltControllerTest {
                .andExpect(status().isNotFound());
     }
 
+    @SneakyThrows
+    @Test
+    public void whenRequestFindMatchDriver_andDriverFound_responseOk_withDriver() {
+        Optional<Driver> optionalRandomDriver = Optional.of(createRandomDriver());
+
+        String driverName = optionalRandomDriver.get().getName();
+
+        when(waltService.locateDriverForDeliveryAt(any(String.class),
+                                                   any(LocalDateTime.class))).thenReturn(
+                optionalRandomDriver);
+
+        LocalDateTime randomDeliveryTime = createRandomDeliveryTime();
+
+        mockMvc.perform(get(ENDPOINT_LOCATE_DRIVER + "/{cityName}/{deliveryTime}",
+                            createRandomCity().getName(),
+                            randomDeliveryTime))
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.name").value(driverName));
+    }
+
 
     private List<Delivery> createRandomDeliveries(int totalDeliveries) {
         return IntStream.range(0, totalDeliveries)
@@ -139,8 +163,11 @@ public class WaltControllerTest {
                        .build();
     }
 
-    private Date createRandomDeliveryTime() {
-        return new Date(ThreadLocalRandom.current().nextInt() * 1000L);
+    private LocalDateTime createRandomDeliveryTime() {
+        long minSeconds = LocalDateTime.of(1970, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
+        long maxSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        long randomSeconds = ThreadLocalRandom.current().nextLong(minSeconds, maxSeconds);
+        return LocalDateTime.ofEpochSecond(randomSeconds, 0, ZoneOffset.UTC);
     }
 
     private Restaurant createRandomRestaurant() {
