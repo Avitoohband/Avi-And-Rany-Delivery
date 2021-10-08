@@ -56,7 +56,7 @@ public class WaltServiceImplTest {
 
     @Test
     public void whenAvailableDriverForDelivery_shouldCreateAndSaveDelivery() {
-        City city = new City("TelAviv");
+        City city = new City("Tel-Aviv");
         Driver driver = new Driver("Moshe", city);
         Customer customer = new Customer("David", city, "Borochov");
         Restaurant restaurant = new Restaurant("Japan-Japan", city, "Hahagana 21");
