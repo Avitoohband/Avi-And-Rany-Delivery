@@ -8,11 +8,13 @@ import com.walt.entity.Restaurant;
 import com.walt.rest.controller.WaltController;
 import com.walt.service.WaltService;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -51,6 +53,12 @@ public class WaltControllerTest {
     @MockBean
     private WaltService waltService;
 
+    @BeforeEach
+    public void foo() {
+
+    }
+
+    @WithMockUser
     @SneakyThrows
     @Test
     public void whenRequestAllDrivers_andHasDrivers_responseIsOK_JSON_withDrivers() {
@@ -64,6 +72,7 @@ public class WaltControllerTest {
                .andExpect(jsonPath("$.length()").value(drivers.size()));
     }
 
+    @WithMockUser
     @SneakyThrows
     @Test
     public void whenRequestAllDrivers_andHasNoDrivers_responseIsOK_withoutDrivers() {
@@ -74,6 +83,7 @@ public class WaltControllerTest {
                .andExpect(jsonPath("$.length()").value(0));
     }
 
+    @WithMockUser
     @SneakyThrows
     @Test
     public void whenRequestAllDeliveries_andHasDeliveries_responseIsOK_JSON_withDeliveries() {
@@ -87,6 +97,7 @@ public class WaltControllerTest {
                .andExpect(jsonPath("$.length()").value(deliveries.size()));
     }
 
+    @WithMockUser
     @SneakyThrows
     @Test
     public void whenRequestAllDeliveries_andHasNoDeliveries_responseIsOK_withoutDeliveries() {
@@ -99,6 +110,7 @@ public class WaltControllerTest {
                .andExpect(jsonPath("$.length()").value(0));
     }
 
+    @WithMockUser
     @SneakyThrows
     @Test
     public void whenRequestGetDriverByName_andHasMatchingDriver_responseOK_withDriver() {
@@ -113,6 +125,7 @@ public class WaltControllerTest {
                .andExpect(jsonPath("$.name").value(driverName));
     }
 
+    @WithMockUser
     @SneakyThrows
     @Test
     public void whenRequestGetDriverByName_andHasNoMatchingDriver_responseNotFound() {
@@ -125,6 +138,7 @@ public class WaltControllerTest {
                .andExpect(status().isNotFound());
     }
 
+    @WithMockUser
     @SneakyThrows
     @Test
     public void whenRequestFindMatchDriver_andDriverFound_responseOk_withDriver() {
